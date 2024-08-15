@@ -6,14 +6,7 @@ import cstimer from 'cstimer_module'
 import cstimerEvents from '../constants/cstimer-events.js'
 import { davisGold } from '../constants/bot-config.js';
 import { CstimerEvent } from '../custom-types.js';
-
-const wcaCategory = cstimerEvents.find(([category]) => category === 'WCA')!;
-const wcaEvents = wcaCategory[1]
-const eventChoices: { name: string; value: string; }[] = 
-    wcaEvents.map(event => ({
-        name: event[0],
-        value: event[1]
-    })).filter(event => event.value !== 'r3ni');//removes multiblind 
+import { cstimerWcaEvents, eventChoices } from '../constants/constants.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -27,11 +20,8 @@ export default {
     async execute(interaction: ChatInputCommandInteraction) {
         await interaction.deferReply();
 
-        const eventID: string | null = interaction.options.getString('event');
-        if (!eventID) { interaction.editReply("No event received"); return; }
-
-        const eventInfo: CstimerEvent | undefined = wcaEvents.find(event => event[1] === eventID);
-        if (!eventInfo) { interaction.editReply("Event not supported"); return; }
+        const eventID: string = interaction.options.getString('event') as string;
+        const eventInfo = cstimerWcaEvents.find(event => event[1] === eventID) as CstimerEvent;
 
         // generate scramble
         var scramble = cstimer.getScramble(eventInfo[1], eventInfo[2]);
